@@ -1,20 +1,31 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+}
 
 version = "2.1.0"
-int version_code = 210
+group = "com.github.KasperLee1017" // ⚠️ 必須對應你的 GitHub ID
 
 android {
     compileSdkVersion 30
+
     defaultConfig {
         minSdkVersion 14
-        versionCode version_code
+        targetSdkVersion 33
+        versionCode 210
         versionName version
+        consumerProguardFiles 'proguard-rules.pro'
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
@@ -24,4 +35,26 @@ dependencies {
     compileOnly 'com.facebook.fresco:fresco:2.5.0'
 }
 
-apply from: "upload-maven-plugin.gradle"
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.KasperLee1017'  // GitHub 使用者名稱
+                artifactId = 'PhotoDraweeView'
+                version = '2.1.0'
+
+                pom {
+                    name.set("PhotoDraweeView")
+                    description.set("A gesture-supporting ImageView based on Fresco")
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                url = uri("$buildDir/repo")
+            }
+        }
+    }
+}
